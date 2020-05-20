@@ -84,7 +84,6 @@
         android:background="@android:color/background_light"
         android:scaleType="fitCenter"
         android:src="@drawable/kick"
-        android:onClick="playKick"
         app:layout_constraintEnd_toStartOf="@+id/snareButton"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toBottomOf="parent" />
@@ -98,7 +97,6 @@
         android:background="@android:color/background_light"
         android:scaleType="fitCenter"
         android:src="@drawable/snare"
-        android:onClick="playSnare"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
@@ -112,7 +110,6 @@
         android:background="@android:color/background_light"
         android:scaleType="fitCenter"
         android:src="@drawable/hat"
-        android:onClick="playHat"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/snareButton"
         app:layout_constraintBottom_toBottomOf="parent" />

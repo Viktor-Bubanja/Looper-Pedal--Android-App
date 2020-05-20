@@ -2,12 +2,14 @@ package com.example.looper
 
 
 import android.Manifest
+import android.animation.ValueAnimator
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.opengl.Visibility
 import android.os.Bundle
 import android.view.*
+import android.view.animation.Animation
+import android.view.animation.LinearInterpolator
 import android.widget.ImageButton
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -25,6 +27,10 @@ class Looper : AppCompatActivity() {
     private lateinit var pauseButton: ImageButton
 
     private lateinit var deleteButton: ImageButton
+
+    private lateinit var kickButton: ImageButton
+    private lateinit var snareButton: ImageButton
+    private lateinit var hatButton: ImageButton
 
     private var audioRecorder: AudioRecorder? = null
     private var audioPlayer: AudioPlayer? = null
@@ -60,15 +66,47 @@ class Looper : AppCompatActivity() {
         pauseButton = findViewById(R.id.pauseButton)
         deleteButton = findViewById(R.id.deleteButton)
 
+        kickButton = findViewById(R.id.kickButton)
+        snareButton = findViewById(R.id.snareButton)
+        hatButton = findViewById(R.id.hatButton)
+
         recordButton.setOnClickListener { onStartRecording() }
         stopRecordButton.setOnClickListener { onStopRecording() }
         playButton.setOnClickListener { onPlayRecording() }
         pauseButton.setOnClickListener { onPauseRecording() }
 
+        kickButton.setOnClickListener {
+            audioPlayer?.playKick()
+            clickAnimation(kickButton)
+        }
+
+        snareButton.setOnClickListener {
+            audioPlayer?.playSnare()
+            clickAnimation(snareButton)
+        }
+
+        hatButton.setOnClickListener {
+            audioPlayer?.playHat()
+            clickAnimation(hatButton)
+        }
+
         stopRecordButton.visibility = View.GONE
         pauseButton.visibility = View.GONE
         playButton.visibility = View.GONE
         deleteButton.visibility = View.GONE
+    }
+
+    private fun clickAnimation(element: ImageButton) {
+        val duration = 100L
+        val valueAnimator = ValueAnimator.ofFloat(1.0F, 1.2F, 1.0F)
+        valueAnimator.addUpdateListener {
+            val animationValue = it.animatedValue as Float
+            element.scaleX = animationValue
+            element.scaleY = animationValue
+        }
+        valueAnimator.interpolator = LinearInterpolator()
+        valueAnimator.duration = duration
+        valueAnimator.start()
     }
 
     override fun onRequestPermissionsResult(
@@ -119,18 +157,6 @@ class Looper : AppCompatActivity() {
         deleteButton.visibility = View.GONE
         pauseButton.visibility = View.GONE
         playButton.visibility = View.GONE
-    }
-
-    fun playKick(view: View) {
-        audioPlayer?.playKick()
-    }
-
-    fun playSnare(view: View) {
-        audioPlayer?.playSnare()
-    }
-
-    fun playHat(view: View) {
-        audioPlayer?.playHat()
     }
 
     override fun onStop() {
