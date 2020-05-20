@@ -8,17 +8,16 @@
     tools:context=".Looper">
 
     <ImageButton
-        android:id="@+id/deleteButton"
+        android:id="@+id/startRecordingButton"
         android:layout_width="@dimen/standard_size"
         android:layout_height="@dimen/standard_size"
         android:layout_marginTop="@dimen/standard_margin"
         android:adjustViewBounds="true"
         android:background="@android:color/background_light"
         android:scaleType="fitCenter"
-        android:src="@drawable/bin"
-        android:onClick="deleteAudio"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/pauseButton"
+        android:src="@drawable/record_button"
+        app:layout_constraintEnd_toStartOf="@+id/snareButton"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <ImageButton
@@ -30,21 +29,21 @@
         android:background="@android:color/background_light"
         android:scaleType="fitCenter"
         android:src="@drawable/stop_record_button"
-        app:layout_constraintEnd_toStartOf="@+id/pauseButton"
+        app:layout_constraintEnd_toStartOf="@+id/snareButton"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:layout_editor_absoluteX="0dp" />
 
     <ImageButton
-        android:id="@+id/startRecordingButton"
+        android:id="@+id/playButton"
         android:layout_width="@dimen/standard_size"
         android:layout_height="@dimen/standard_size"
         android:layout_marginTop="@dimen/standard_margin"
         android:adjustViewBounds="true"
         android:background="@android:color/background_light"
         android:scaleType="fitCenter"
-        android:src="@drawable/record_button"
-        app:layout_constraintEnd_toStartOf="@+id/pauseButton"
+        android:src="@drawable/play_button"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -62,17 +61,19 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <ImageButton
-        android:id="@+id/playButton"
+        android:id="@+id/deleteButton"
         android:layout_width="@dimen/standard_size"
         android:layout_height="@dimen/standard_size"
         android:layout_marginTop="@dimen/standard_margin"
         android:adjustViewBounds="true"
         android:background="@android:color/background_light"
         android:scaleType="fitCenter"
-        android:src="@drawable/play_button"
+        android:src="@drawable/bin"
+        android:onClick="deleteAudio"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/snareButton"
         app:layout_constraintTop_toTopOf="parent" />
+
 
     <ImageButton
         android:id="@+id/kickButton"
@@ -84,7 +85,7 @@
         android:scaleType="fitCenter"
         android:src="@drawable/kick"
         android:onClick="playKick"
-        app:layout_constraintEnd_toStartOf="@+id/pauseButton"
+        app:layout_constraintEnd_toStartOf="@+id/snareButton"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toBottomOf="parent" />
 
@@ -113,6 +114,7 @@
         android:src="@drawable/hat"
         android:onClick="playHat"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/pauseButton"
+        app:layout_constraintStart_toEndOf="@+id/snareButton"
         app:layout_constraintBottom_toBottomOf="parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

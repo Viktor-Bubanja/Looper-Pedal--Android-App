@@ -55,14 +55,10 @@ class AudioPlayer(context: Context) {
     }
 
     fun pauseAudioFile() {
-        Log.d("AAA", "paused")
-        Log.d("AAA", audioStreamId.toString())
-        Log.d("AAA", soundPool.toString())
         audioStreamId?.let { soundPool?.pause(it) }
     }
 
     fun clearAudioFile() {
-        Log.d("AAA", "cleared")
         pauseAudioFile()
         audioStreamId?.let { soundPool?.stop(it) }
         loadedAudioId?.let { soundPool?.unload(it) }

@@ -24,6 +24,8 @@ class Looper : AppCompatActivity() {
     private lateinit var playButton: ImageButton
     private lateinit var pauseButton: ImageButton
 
+    private lateinit var deleteButton: ImageButton
+
     private var audioRecorder: AudioRecorder? = null
     private var audioPlayer: AudioPlayer? = null
 
@@ -52,10 +54,11 @@ class Looper : AppCompatActivity() {
     }
 
     private fun initialiseRecordingButtons() {
-        recordButton = findViewById<ImageButton>(R.id.startRecordingButton)
+        recordButton = findViewById(R.id.startRecordingButton)
         stopRecordButton = findViewById(R.id.stopRecordingButton)
         playButton = findViewById(R.id.playButton)
         pauseButton = findViewById(R.id.pauseButton)
+        deleteButton = findViewById(R.id.deleteButton)
 
         recordButton.setOnClickListener { onStartRecording() }
         stopRecordButton.setOnClickListener { onStopRecording() }
@@ -64,6 +67,8 @@ class Looper : AppCompatActivity() {
 
         stopRecordButton.visibility = View.GONE
         pauseButton.visibility = View.GONE
+        playButton.visibility = View.GONE
+        deleteButton.visibility = View.GONE
     }
 
     override fun onRequestPermissionsResult(
@@ -91,7 +96,9 @@ class Looper : AppCompatActivity() {
     private fun onStopRecording() {
         startRecordingButton.visibility = View.VISIBLE
         stopRecordButton.visibility = View.GONE
+        playButton.visibility = View.VISIBLE
         audioRecorder?.stop()
+        deleteButton.visibility = View.VISIBLE
     }
 
     private fun onPlayRecording() {
@@ -109,6 +116,9 @@ class Looper : AppCompatActivity() {
     fun deleteAudio(view: View) {
         filename = null
         audioPlayer?.clearAudioFile()
+        deleteButton.visibility = View.GONE
+        pauseButton.visibility = View.GONE
+        playButton.visibility = View.GONE
     }
 
     fun playKick(view: View) {
