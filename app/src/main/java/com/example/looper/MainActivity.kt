@@ -45,21 +45,25 @@ class MainActivity : AppCompatActivity() {
         Manifest.permission.WRITE_EXTERNAL_STORAGE
     )
 
-    override fun onCreate(icicle: Bundle?) {
-        super.onCreate(icicle)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         initialiseRecordingButtons()
+
+        Log.d("AAA", "on createa again")
 
         filename = "${externalCacheDir.absolutePath}/audiorecordtest.mp3"
 //        fileName = Environment.getExternalStorageDirectory().absolutePath + "/recording.mp3"
 
+        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
+        isLoopingFile = sharedPreferences.getBoolean("enableLooping", true)
+        ActivityCompat.requestPermissions(this, permissions, REQUEST_RECORD_AUDIO_PERMISSION)
+    }
+
+    override fun onStart() {
+        super.onStart()
         audioRecorder = AudioRecorder(filename!!)
         samplePlayer = SamplePlayer(baseContext)
-        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
-        val enableLooping = sharedPreferences.getBoolean("enableLooping", true)
-        isLoopingFile = enableLooping
-
-        ActivityCompat.requestPermissions(this, permissions, REQUEST_RECORD_AUDIO_PERMISSION)
     }
 
     private fun initialiseRecordingButtons() {
@@ -79,6 +83,8 @@ class MainActivity : AppCompatActivity() {
         pauseButton.setOnClickListener { onPauseRecording() }
 
         kickButton.setOnClickListener {
+            Log.d("AAA", "samplePlayer")
+            Log.d("AAA", samplePlayer.toString())
             samplePlayer?.playKick()
             clickAnimation(kickButton)
         }
@@ -137,7 +143,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun onPauseRecording() {
         showPlayButton()
-        AudioFilePlayer.pauseAudioFile()
+        pauseAudioFile()
     }
 
     fun deleteAudio(view: View) {

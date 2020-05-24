@@ -3,6 +3,7 @@ package com.example.looper
 import android.content.Context
 import android.media.AudioAttributes
 import android.media.SoundPool
+import android.util.Log
 import com.example.looper.AudioPlayer.initialiseSoundPool
 import com.example.looper.AudioPlayer.playSound
 
@@ -20,6 +21,10 @@ class SamplePlayer(context: Context): SoundPoolHolder {
     }
 
     fun playKick() {
+        Log.d("AAA", "kickId")
+        Log.d("AAA", kickId.toString())
+        Log.d("AAA", "soundPool")
+        Log.d("AAA", soundPool.toString())
         kickId?.let { playSound(it, soundPool) }
     }
 
