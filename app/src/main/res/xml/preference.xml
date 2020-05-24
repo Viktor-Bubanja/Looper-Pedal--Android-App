@@ -1,0 +1,10 @@
+<PreferenceScreen
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <SwitchPreferenceCompat
+        app:key="enableLooping"
+        app:title="@string/enable_looping"
+        app:summary="@string/looping_pref_summary"
+        app:defaultValue="true"/>
+
+</PreferenceScreen>

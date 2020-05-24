@@ -4,4 +4,125 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity"/>
+    android:background="@android:color/background_light"
+    tools:context=".MainActivity">
+
+    <ImageButton
+        android:id="@+id/startRecordingButton"
+        android:layout_width="@dimen/standard_size"
+        android:layout_height="@dimen/standard_size"
+        android:layout_marginTop="@dimen/standard_margin"
+        android:adjustViewBounds="true"
+        android:background="@android:color/background_light"
+        android:scaleType="fitCenter"
+        android:src="@drawable/record_button"
+        app:layout_constraintEnd_toStartOf="@+id/snareButton"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageButton
+        android:id="@+id/stopRecordingButton"
+        android:layout_width="@dimen/standard_size"
+        android:layout_height="@dimen/standard_size"
+        android:layout_marginTop="@dimen/standard_margin"
+        android:adjustViewBounds="true"
+        android:background="@android:color/background_light"
+        android:scaleType="fitCenter"
+        android:src="@drawable/stop_record_button"
+        app:layout_constraintEnd_toStartOf="@+id/snareButton"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:layout_editor_absoluteX="0dp" />
+
+    <ImageButton
+        android:id="@+id/playButton"
+        android:layout_width="@dimen/standard_size"
+        android:layout_height="@dimen/standard_size"
+        android:layout_marginTop="@dimen/standard_margin"
+        android:adjustViewBounds="true"
+        android:background="@android:color/background_light"
+        android:scaleType="fitCenter"
+        android:src="@drawable/play_button"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageButton
+        android:id="@+id/pauseButton"
+        android:layout_width="@dimen/standard_size"
+        android:layout_height="@dimen/standard_size"
+        android:layout_marginTop="@dimen/standard_margin"
+        android:adjustViewBounds="true"
+        android:background="@android:color/background_light"
+        android:scaleType="fitCenter"
+        android:src="@drawable/pause_button"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageButton
+        android:id="@+id/deleteButton"
+        android:layout_width="@dimen/standard_size"
+        android:layout_height="@dimen/standard_size"
+        android:layout_marginTop="@dimen/standard_margin"
+        android:adjustViewBounds="true"
+        android:background="@android:color/background_light"
+        android:scaleType="fitCenter"
+        android:src="@drawable/bin"
+        android:onClick="deleteAudio"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/snareButton"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+    <ImageButton
+        android:id="@+id/kickButton"
+        android:layout_width="@dimen/standard_size"
+        android:layout_height="@dimen/standard_size"
+        android:layout_marginBottom="@dimen/standard_margin"
+        android:adjustViewBounds="true"
+        android:background="@android:color/background_light"
+        android:scaleType="fitCenter"
+        android:src="@drawable/kick"
+        app:layout_constraintEnd_toStartOf="@+id/snareButton"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+    <ImageButton
+        android:id="@+id/snareButton"
+        android:layout_width="@dimen/standard_size"
+        android:layout_height="@dimen/standard_size"
+        android:layout_marginBottom="@dimen/standard_margin"
+        android:adjustViewBounds="true"
+        android:background="@android:color/background_light"
+        android:scaleType="fitCenter"
+        android:src="@drawable/snare"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <ImageButton
+        android:id="@+id/hatButton"
+        android:layout_width="@dimen/standard_size"
+        android:layout_height="@dimen/standard_size"
+        android:layout_marginBottom="@dimen/standard_margin"
+        android:adjustViewBounds="true"
+        android:background="@android:color/background_light"
+        android:scaleType="fitCenter"
+        android:src="@drawable/hat"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/snareButton"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+    <Button
+        android:id="@+id/preferencesButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Button"
+        android:onClick="goToPreferences"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
