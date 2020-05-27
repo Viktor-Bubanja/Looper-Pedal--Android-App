@@ -2,6 +2,11 @@ package com.example.looper
 
 
 import android.Manifest
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
+import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
@@ -9,16 +14,17 @@ import android.view.*
 import android.widget.ImageButton
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import androidx.preference.PreferenceManager
 import com.example.looper.AudioFilePlayer.isLoopingFile
+import com.example.looper.AudioFilePlayer.loadedAudioId
 import com.example.looper.AudioFilePlayer.pauseAudioFile
 
 private const val REQUEST_RECORD_AUDIO_PERMISSION = 200
 private const val REQUEST_WRITE_FILE_PERMISSION = 400
 
 class MainActivity : AppCompatActivity() {
-
-    private var isFileRecorded: Boolean = false
 
     private lateinit var recordButton: ImageButton
     private lateinit var stopRecordButton: ImageButton
@@ -37,6 +43,8 @@ class MainActivity : AppCompatActivity() {
 
     private var filename: String? = null
 
+    private val CHANNEL_ID: String = "100"
+
     private var permissionToRecordAccepted = false
     private var permissionToWriteFileAccepted = false
 
@@ -48,7 +56,9 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        createNotificationChannel()
         initialiseRecordingButtons()
+        RecordingState.isRecording = false
 
         Log.d("AAA", "on createa again")
 
@@ -58,6 +68,8 @@ class MainActivity : AppCompatActivity() {
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
         isLoopingFile = sharedPreferences.getBoolean("enableLooping", true)
         ActivityCompat.requestPermissions(this, permissions, REQUEST_RECORD_AUDIO_PERMISSION)
+
+
     }
 
     override fun onStart() {
@@ -121,8 +133,32 @@ class MainActivity : AppCompatActivity() {
         if (!permissionToRecordAccepted) finish()
     }
 
+    override fun onRestoreInstanceState(savedInstanceState: Bundle?) {
+        super.onRestoreInstanceState(savedInstanceState)
+        Log.d("AAA", "onrestoreinstancestate called")
+        val hasRecorded = savedInstanceState?.getBoolean("hasRecorded", false)
+
+        if (hasRecorded == true) {
+            showPlayButton()
+            showDeleteButton()
+            RecordingState.hasRecorded = true
+        } else {
+            hidePlayPauseButtons()
+            RecordingState.hasRecorded = false
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        Log.d("AAA", "onresume called")
+        if (loadedAudioId != null) {
+            Log.d("AAA", "loaded audio id not null")
+            Log.d("AAA", loadedAudioId.toString())
+        }
+    }
+
     private fun onStartRecording() {
-        isFileRecorded = true
+        RecordingState.hasRecorded = true
         showStopRecordButton()
         audioRecorder?.start()
     }
@@ -147,11 +183,17 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun deleteAudio(view: View) {
-        isFileRecorded = false
+        RecordingState.hasRecorded = false
         AudioFilePlayer.clearAudioFile()
+        AudioFilePlayer.release()
         hideDeleteButton()
-        pauseButton.visibility = View.GONE
-        playButton.visibility = View.GONE
+        hidePlayPauseButtons()
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        Log.d("AAA", "save instanec sttae")
+        outState.putBoolean("hasRecorded", RecordingState.hasRecorded)
     }
 
     override fun onStop() {
@@ -159,6 +201,49 @@ class MainActivity : AppCompatActivity() {
         audioRecorder?.release()
         samplePlayer?.release()
         AudioFilePlayer.release()
+        showRecordButton()
+        showPlayButton()
+        showDeleteButton()
+        if (RecordingState.isRecording) {
+            Log.d("AAA", RecordingState.isRecording.toString())
+            notifyUser()
+        }
+
+        Log.d("AAA", "on stop called")
+    }
+
+    private fun notifyUser() {
+        val notificationId = System.currentTimeMillis().toInt()
+        val intent = Intent(this, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_REORDER_TO_FRONT
+        }
+
+        val pendingIntent: PendingIntent = PendingIntent.getActivity(this, 0, intent, 0)
+
+
+        val title = "Looper stopped recording"
+        val builder = NotificationCompat.Builder(this, CHANNEL_ID)
+            .setSmallIcon(R.drawable.looper_icon)
+            .setContentTitle(title)
+            .setPriority(NotificationCompat.PRIORITY_LOW)
+            .setContentIntent(pendingIntent)
+            .setAutoCancel(true)
+
+        with(NotificationManagerCompat.from(this)) {
+            notify(notificationId, builder.build())
+        }
+    }
+
+    private fun createNotificationChannel() {
+        val name = getString(R.string.channel_name)
+        val descriptionText = getString(R.string.channel_description)
+        val importance = NotificationManager.IMPORTANCE_LOW
+        val channel = NotificationChannel(CHANNEL_ID, name, importance).apply {
+            description = descriptionText
+        }
+        val notificationManager: NotificationManager =
+            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.createNotificationChannel(channel)
     }
 
     private fun showRecordButton() {
@@ -187,6 +272,11 @@ class MainActivity : AppCompatActivity() {
 
     private fun hideDeleteButton() {
         deleteButton.visibility = View.GONE
+    }
+
+    private fun hidePlayPauseButtons() {
+        playButton.visibility = View.GONE
+        pauseButton.visibility = View.GONE
     }
 
     fun goToPreferences(view: View) {

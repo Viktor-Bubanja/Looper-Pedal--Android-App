@@ -7,7 +7,7 @@ import com.example.looper.AudioPlayer.playSound
 
 
 object AudioFilePlayer: SoundPoolHolder {
-    private var loadedAudioId: Int? = null
+    var loadedAudioId: Int? = null
     private var audioStreamId: Int? = null
     var isLoopingFile: Boolean = true
     private var soundPool: SoundPool? = null
