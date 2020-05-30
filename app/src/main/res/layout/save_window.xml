@@ -36,8 +36,10 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:hint="@string/filename_hint"
+                android:textColorHint="@color/lightGreen"
                 android:padding="10dp"
-                android:textSize="20sp" />
+                android:textSize="20sp"
+                android:textColor="@color/green"/>
 
             <Button
                 android:id="@+id/saveButton"

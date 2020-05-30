@@ -94,25 +94,29 @@ class MainActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         return when (item?.itemId) {
             R.id.actionSave -> {
-                saveRecording()
+                showSavePopupWindow()
                 true
             }
             R.id.actionLoad -> {
-                loadRecording()
+                showLoadPopupWindow()
+                true
+            }
+            R.id.actionSettings -> {
+                goToPreferences()
                 true
             }
             else -> super.onOptionsItemSelected(item)
         }
     }
 
-    fun showSavePopupWindow(item: MenuItem) {
+    fun showSavePopupWindow() {
         val savePopup = createPopupWindow(R.layout.save_window, R.id.saveButton, R.id.closeSaveMenu)
         val window = savePopup.window
         savePopup.actionButton?.setOnClickListener { saveRecording() }
         openPopupWindow(window)
     }
 
-    fun showLoadPopupWindow(item: MenuItem) {
+    fun showLoadPopupWindow() {
         val loadPopup = createPopupWindow(R.layout.load_window, R.id.loadButton, R.id.closeLoadMenu)
         val window = loadPopup.window
         loadPopup.actionButton?.setOnClickListener { loadRecording() }
@@ -126,6 +130,11 @@ class MainActivity : AppCompatActivity() {
             Gravity.CENTER,
             0, -100
         )
+    }
+
+    private fun goToPreferences() {
+        pauseAudioFile()
+        startActivity(PreferencesActivity.newIntent(this))
     }
 
     private fun createPopupWindow(layoutId: Int, actionButtonId: Int, closeButtonId: Int): Popup {
@@ -227,6 +236,9 @@ class MainActivity : AppCompatActivity() {
     private fun onStartRecording() {
         RecordingState.hasRecorded = true
         showStopRecordButton()
+        hidePlayPauseButtons()
+        hideDeleteButton()
+        hideSaveActionButton()
         audioRecorder?.start()
     }
 
@@ -350,9 +362,6 @@ class MainActivity : AppCompatActivity() {
         pauseButton.visibility = View.GONE
     }
 
-    fun goToPreferences(view: View) {
-        pauseAudioFile()
-        startActivity(PreferencesActivity.newIntent(this))
-    }
+
 
 }

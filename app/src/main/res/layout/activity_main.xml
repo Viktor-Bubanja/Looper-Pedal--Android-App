@@ -115,17 +115,4 @@
         app:layout_constraintStart_toEndOf="@+id/snareButton"
         app:layout_constraintBottom_toBottomOf="parent" />
 
-    <ImageButton
-        android:id="@+id/preferencesButton"
-        android:layout_width="@dimen/standard_size"
-        android:layout_height="@dimen/standard_size"
-        android:layout_marginBottom="@dimen/standard_margin"
-        android:adjustViewBounds="true"
-        android:background="@android:color/background_light"
-        android:onClick="goToPreferences"
-        android:scaleType="fitCenter"
-        app:layout_constraintBottom_toTopOf="@+id/hatButton"
-        app:layout_constraintStart_toStartOf="@+id/hatButton"
-        app:srcCompat="@drawable/settings" />
-
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -4,11 +4,13 @@
     <item android:id="@+id/actionSave"
         android:title="@string/save"
         android:icon="@drawable/save_icon"
-        android:onClick="showSavePopupWindow"
         app:showAsAction="ifRoom"/>
     <item android:id="@+id/actionLoad"
         android:title="@string/load"
         android:icon="@drawable/load_icon"
-        android:onClick="showLoadPopupWindow"
+        app:showAsAction="ifRoom"/>
+    <item android:id="@+id/actionSettings"
+        android:title="@string/settings"
+        android:icon="@drawable/settings_icon"
         app:showAsAction="ifRoom"/>
 </menu>
