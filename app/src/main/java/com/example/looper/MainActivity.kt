@@ -8,9 +8,11 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.opengl.Visibility
 import android.os.Bundle
 import android.os.Environment
 import android.util.Log
+import android.view.Gravity
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -27,6 +29,7 @@ import androidx.preference.PreferenceManager
 import com.example.looper.AudioFilePlayer.isLoopingFile
 import com.example.looper.AudioFilePlayer.loadedAudioId
 import com.example.looper.AudioFilePlayer.pauseAudioFile
+import kotlinx.android.synthetic.main.activity_main.*
 
 
 private const val REQUEST_RECORD_AUDIO_PERMISSION = 200
@@ -45,6 +48,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var kickButton: ImageButton
     private lateinit var snareButton: ImageButton
     private lateinit var hatButton: ImageButton
+
+    private var saveActionItem: MenuItem? = null
 
     private var audioRecorder: AudioRecorder? = null
     private var samplePlayer: SamplePlayer? = null
@@ -78,35 +83,51 @@ class MainActivity : AppCompatActivity() {
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
         isLoopingFile = sharedPreferences.getBoolean("enableLooping", true)
         ActivityCompat.requestPermissions(this, permissions, REQUEST_RECORD_AUDIO_PERMISSION)
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.main_activity_bar, menu)
+        saveActionItem = menu?.findItem(R.id.actionSave)
+        saveActionItem?.isVisible = RecordingState.hasRecorded == true
         return true
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        when (item?.itemId) {
-            R.id.action_save -> saveRecording()
-            R.id.action_load -> loadRecording()
+        return when (item?.itemId) {
+            R.id.actionSave -> {
+                saveRecording()
+                true
+            }
+            R.id.actionLoad -> {
+                loadRecording()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
         }
-        return super.onOptionsItemSelected(item)
     }
 
     fun showPopupWindow(item: MenuItem) {
-        Log.d("AAA", "here")
         val windowView: View = layoutInflater.inflate(R.layout.save_window, null)
-//        saveWindow = PopupWindow(
-//            windowView,
-//            ConstraintLayout.LayoutParams.WRAP_CONTENT,
-//            ConstraintLayout.LayoutParams.WRAP_CONTENT
-//        )
-//        saveWindow?.elevation = 5.0f
-//        val saveButton = windowView.findViewById<Button>(R.id.saveButton)
-//        saveButton.setOnClickListener { saveRecording() }
-//
-//        val closeButton = windowView.findViewById<Button>(R.id.closeButton)
-//        closeButton.setOnClickListener { saveWindow?.dismiss() }
+        saveWindow = PopupWindow(
+            windowView,
+            ConstraintLayout.LayoutParams.WRAP_CONTENT,
+            ConstraintLayout.LayoutParams.WRAP_CONTENT
+        )
+        saveWindow?.elevation = 5.0f
+        val saveButton = windowView.findViewById<Button>(R.id.saveButton)
+        saveButton.setOnClickListener { saveRecording() }
+
+        saveWindow?.setFocusable(true); // Allows keyboard to be shown
+
+        val closeButton = windowView.findViewById<ImageButton>(R.id.closeButton)
+        closeButton.setOnClickListener { saveWindow?.dismiss() }
+
+        saveWindow?.showAtLocation(
+            root_layout,
+            Gravity.CENTER,
+            0,
+            -100)
     }
 
     fun saveRecording() {
@@ -178,7 +199,6 @@ class MainActivity : AppCompatActivity() {
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle?) {
         super.onRestoreInstanceState(savedInstanceState)
-        Log.d("AAA", "onrestoreinstancestate called")
         val hasRecorded = savedInstanceState?.getBoolean("hasRecorded", false)
 
         if (hasRecorded == true) {
@@ -188,15 +208,6 @@ class MainActivity : AppCompatActivity() {
         } else {
             hidePlayPauseButtons()
             RecordingState.hasRecorded = false
-        }
-    }
-
-    override fun onResume() {
-        super.onResume()
-        Log.d("AAA", "onresume called")
-        if (loadedAudioId != null) {
-            Log.d("AAA", "loaded audio id not null")
-            Log.d("AAA", loadedAudioId.toString())
         }
     }
 
@@ -210,13 +221,12 @@ class MainActivity : AppCompatActivity() {
         showRecordButton()
         showPlayButton()
         showDeleteButton()
+        showSaveActionButton()
         audioRecorder?.stop()
     }
 
     private fun onPlayRecording() {
         showPauseButton()
-        Log.d("AAA", "play recording")
-        Log.d("AAA", filename.toString())
         filename?.let { AudioFilePlayer.playAudioFile(it) }
     }
 
@@ -231,11 +241,19 @@ class MainActivity : AppCompatActivity() {
         AudioFilePlayer.release()
         hideDeleteButton()
         hidePlayPauseButtons()
+        hideSaveActionButton()
+    }
+
+    private fun showSaveActionButton() {
+        saveActionItem?.isVisible = true
+    }
+
+    private fun hideSaveActionButton() {
+        saveActionItem?.isVisible = false
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        Log.d("AAA", "save instanec sttae")
         outState.putBoolean("hasRecorded", RecordingState.hasRecorded)
     }
 
@@ -248,11 +266,8 @@ class MainActivity : AppCompatActivity() {
         showPlayButton()
         showDeleteButton()
         if (RecordingState.isRecording) {
-            Log.d("AAA", RecordingState.isRecording.toString())
             notifyUser()
         }
-
-        Log.d("AAA", "on stop called")
     }
 
     private fun notifyUser() {
