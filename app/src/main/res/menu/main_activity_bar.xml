@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item android:id="@+id/action_save"
+        android:title="@string/save"
+        android:icon="@drawable/save_icon"
+        android:onClick="showPopupWindow"
+        app:showAsAction="ifRoom"/>
+    <item android:id="@+id/action_load"
+        android:title="@string/load"
+        android:icon="@drawable/load_icon"
+        app:showAsAction="ifRoom"/>
+</menu>

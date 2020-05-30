@@ -5,4 +5,6 @@
     <string name="looping_pref_summary">When enabled, recorded audio will be looped.</string>
     <string name="channel_name">notifications</string>
     <string name="channel_description">notification channel</string>
+    <string name="save">Save</string>
+    <string name="load">Load</string>
 </resources>

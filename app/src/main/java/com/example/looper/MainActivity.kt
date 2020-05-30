@@ -9,10 +9,17 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.os.Environment
 import android.util.Log
-import android.view.*
+import android.view.Menu
+import android.view.MenuItem
+import android.view.View
+import android.widget.Button
 import android.widget.ImageButton
+import android.widget.LinearLayout
+import android.widget.PopupWindow
 import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
@@ -20,6 +27,7 @@ import androidx.preference.PreferenceManager
 import com.example.looper.AudioFilePlayer.isLoopingFile
 import com.example.looper.AudioFilePlayer.loadedAudioId
 import com.example.looper.AudioFilePlayer.pauseAudioFile
+
 
 private const val REQUEST_RECORD_AUDIO_PERMISSION = 200
 private const val REQUEST_WRITE_FILE_PERMISSION = 400
@@ -45,6 +53,8 @@ class MainActivity : AppCompatActivity() {
 
     private val CHANNEL_ID: String = "100"
 
+    private var saveWindow: PopupWindow? = null
+
     private var permissionToRecordAccepted = false
     private var permissionToWriteFileAccepted = false
 
@@ -62,15 +72,48 @@ class MainActivity : AppCompatActivity() {
 
         Log.d("AAA", "on createa again")
 
-        filename = "${externalCacheDir.absolutePath}/audiorecordtest.mp3"
-//        fileName = Environment.getExternalStorageDirectory().absolutePath + "/recording.mp3"
+//        filename = "${externalCacheDir.absolutePath}/audiorecordtest.mp3"
+        filename = Environment.getExternalStorageDirectory().absolutePath + "/recording.mp3"
 
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
         isLoopingFile = sharedPreferences.getBoolean("enableLooping", true)
         ActivityCompat.requestPermissions(this, permissions, REQUEST_RECORD_AUDIO_PERMISSION)
-
-
     }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.main_activity_bar, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        when (item?.itemId) {
+            R.id.action_save -> saveRecording()
+            R.id.action_load -> loadRecording()
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
+    fun showPopupWindow(item: MenuItem) {
+        Log.d("AAA", "here")
+        val windowView: View = layoutInflater.inflate(R.layout.save_window, null)
+//        saveWindow = PopupWindow(
+//            windowView,
+//            ConstraintLayout.LayoutParams.WRAP_CONTENT,
+//            ConstraintLayout.LayoutParams.WRAP_CONTENT
+//        )
+//        saveWindow?.elevation = 5.0f
+//        val saveButton = windowView.findViewById<Button>(R.id.saveButton)
+//        saveButton.setOnClickListener { saveRecording() }
+//
+//        val closeButton = windowView.findViewById<Button>(R.id.closeButton)
+//        closeButton.setOnClickListener { saveWindow?.dismiss() }
+    }
+
+    fun saveRecording() {
+        Log.d("AAA", "Save")
+    }
+
+    fun loadRecording() {}
 
     override fun onStart() {
         super.onStart()
