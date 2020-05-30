@@ -8,7 +8,6 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.opengl.Visibility
 import android.os.Bundle
 import android.os.Environment
 import android.util.Log
@@ -18,7 +17,6 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.Button
 import android.widget.ImageButton
-import android.widget.LinearLayout
 import android.widget.PopupWindow
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -27,9 +25,9 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.preference.PreferenceManager
 import com.example.looper.AudioFilePlayer.isLoopingFile
-import com.example.looper.AudioFilePlayer.loadedAudioId
 import com.example.looper.AudioFilePlayer.pauseAudioFile
 import kotlinx.android.synthetic.main.activity_main.*
+import java.io.File
 
 
 private const val REQUEST_RECORD_AUDIO_PERMISSION = 200
@@ -219,20 +217,6 @@ class MainActivity : AppCompatActivity() {
         if (!permissionToRecordAccepted) finish()
     }
 
-    override fun onRestoreInstanceState(savedInstanceState: Bundle?) {
-        super.onRestoreInstanceState(savedInstanceState)
-        val hasRecorded = savedInstanceState?.getBoolean("hasRecorded", false)
-
-        if (hasRecorded == true) {
-            showPlayButton()
-            showDeleteButton()
-            RecordingState.hasRecorded = true
-        } else {
-            hidePlayPauseButtons()
-            RecordingState.hasRecorded = false
-        }
-    }
-
     private fun onStartRecording() {
         RecordingState.hasRecorded = true
         showStopRecordButton()
@@ -267,6 +251,9 @@ class MainActivity : AppCompatActivity() {
         hideDeleteButton()
         hidePlayPauseButtons()
         hideSaveActionButton()
+        val file  = File(filename)
+        val deleted = file.delete()
+        Log.d("AAA", deleted.toString())
     }
 
     private fun showSaveActionButton() {
@@ -288,10 +275,10 @@ class MainActivity : AppCompatActivity() {
         samplePlayer?.release()
         AudioFilePlayer.release()
         showRecordButton()
-        showPlayButton()
-        showDeleteButton()
         if (RecordingState.isRecording) {
             notifyUser()
+            showPlayButton()
+            showDeleteButton()
         }
     }
 
