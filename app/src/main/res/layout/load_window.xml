@@ -21,7 +21,7 @@
             android:padding="10dp">
 
             <ImageButton
-                android:id="@+id/closeSaveMenu"
+                android:id="@+id/closeLoadMenu"
                 android:layout_width="57dp"
                 android:layout_height="48dp"
                 android:adjustViewBounds="true"
@@ -30,23 +30,15 @@
                 android:scaleType="fitCenter"
                 app:srcCompat="@drawable/close_icon" />
 
-            <EditText
-                android:id="@+id/titleText"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:hint="@string/filename_hint"
-                android:padding="10dp"
-                android:textSize="20sp" />
 
             <Button
-                android:id="@+id/saveButton"
+                android:id="@+id/loadButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:textColor="@color/white"
                 android:background="@color/colorPrimary"
-                android:text="@string/save" />
+                android:text="@string/open" />
 
 
         </LinearLayout>

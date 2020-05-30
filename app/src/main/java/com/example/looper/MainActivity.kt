@@ -58,8 +58,6 @@ class MainActivity : AppCompatActivity() {
 
     private val CHANNEL_ID: String = "100"
 
-    private var saveWindow: PopupWindow? = null
-
     private var permissionToRecordAccepted = false
     private var permissionToWriteFileAccepted = false
 
@@ -107,27 +105,42 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun showPopupWindow(item: MenuItem) {
-        val windowView: View = layoutInflater.inflate(R.layout.save_window, null)
-        saveWindow = PopupWindow(
+    fun showSavePopupWindow(item: MenuItem) {
+        val savePopup = createPopupWindow(R.layout.save_window, R.id.saveButton, R.id.closeSaveMenu)
+        val window = savePopup.window
+        savePopup.actionButton?.setOnClickListener { saveRecording() }
+        openPopupWindow(window)
+    }
+
+    fun showLoadPopupWindow(item: MenuItem) {
+        val loadPopup = createPopupWindow(R.layout.load_window, R.id.loadButton, R.id.closeLoadMenu)
+        val window = loadPopup.window
+        loadPopup.actionButton?.setOnClickListener { loadRecording() }
+        openPopupWindow(window)
+    }
+
+    private fun openPopupWindow(window: PopupWindow?) {
+        Log.d("AAA", window.toString())
+        window?.showAtLocation(
+            root_layout,
+            Gravity.CENTER,
+            0, -100
+        )
+    }
+
+    private fun createPopupWindow(layoutId: Int, actionButtonId: Int, closeButtonId: Int): Popup {
+        val windowView: View = layoutInflater.inflate(layoutId, null)
+        val window = PopupWindow(
             windowView,
             ConstraintLayout.LayoutParams.WRAP_CONTENT,
             ConstraintLayout.LayoutParams.WRAP_CONTENT
         )
-        saveWindow?.elevation = 5.0f
-        val saveButton = windowView.findViewById<Button>(R.id.saveButton)
-        saveButton.setOnClickListener { saveRecording() }
-
-        saveWindow?.setFocusable(true); // Allows keyboard to be shown
-
-        val closeButton = windowView.findViewById<ImageButton>(R.id.closeButton)
-        closeButton.setOnClickListener { saveWindow?.dismiss() }
-
-        saveWindow?.showAtLocation(
-            root_layout,
-            Gravity.CENTER,
-            0,
-            -100)
+        window.elevation = 5.0f
+        window.isFocusable = true // Allows keyboard to be shown
+        val actionButton = windowView.findViewById<Button>(actionButtonId)
+        val closeButton = windowView.findViewById<ImageButton>(closeButtonId)
+        closeButton.setOnClickListener { window.dismiss() }
+        return Popup(window, actionButton, closeButton)
     }
 
     fun saveRecording() {
