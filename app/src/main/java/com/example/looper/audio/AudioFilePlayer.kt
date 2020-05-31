@@ -1,9 +1,8 @@
-package com.example.looper
+package com.example.looper.audio
 
 import android.media.SoundPool
-import android.util.Log
-import com.example.looper.AudioPlayer.initialiseSoundPool
-import com.example.looper.AudioPlayer.playSound
+import com.example.looper.audio.AudioPlayer.initialiseSoundPool
+import com.example.looper.audio.AudioPlayer.playSound
 
 
 object AudioFilePlayer: SoundPoolHolder {
@@ -21,7 +20,9 @@ object AudioFilePlayer: SoundPoolHolder {
             soundPool = initialiseSoundPool()
         }
         soundPool?.setOnLoadCompleteListener { soundPool, sampleId, status ->
-            audioStreamId = playSound(sampleId, soundPool, this.isLoopingFile)
+            audioStreamId = playSound(sampleId, soundPool,
+                isLoopingFile
+            )
         }
         loadedAudioId = soundPool?.load(filename, 1)
     }

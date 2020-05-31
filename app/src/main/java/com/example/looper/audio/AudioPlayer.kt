@@ -1,4 +1,4 @@
-package com.example.looper
+package com.example.looper.audio
 
 import android.media.AudioAttributes
 import android.media.SoundPool

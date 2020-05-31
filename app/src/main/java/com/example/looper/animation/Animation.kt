@@ -1,4 +1,4 @@
-package com.example.looper
+package com.example.looper.animation
 
 import android.animation.ValueAnimator.*
 import android.view.animation.LinearInterpolator

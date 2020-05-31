@@ -1,4 +1,4 @@
-package com.example.looper
+package com.example.looper.model
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

@@ -1,4 +1,4 @@
-package com.example.looper
+package com.example.looper.activity
 
 import android.Manifest
 import android.app.NotificationChannel
@@ -20,13 +20,19 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
-import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModelProvider
 import androidx.preference.PreferenceManager
-import com.example.looper.AudioFilePlayer.isLoopingFile
-import com.example.looper.AudioFilePlayer.pauseAudioFile
+import com.example.looper.animation.clickAnimation
+import com.example.looper.audio.AudioFilePlayer
+import com.example.looper.*
+import com.example.looper.audio.AudioFilePlayer.isLoopingFile
+import com.example.looper.audio.AudioFilePlayer.pauseAudioFile
+import com.example.looper.audio.AudioRecorder
+import com.example.looper.audio.RecordingState
+import com.example.looper.audio.SamplePlayer
+import com.example.looper.model.AudioFile
+import com.example.looper.viewmodel.AudioFileViewModel
 import kotlinx.android.synthetic.main.activity_main.*
 import java.io.File
 
@@ -81,9 +87,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         createNotificationChannel()
-        initialiseRecordingButtons()
         RecordingState.isRecording = false
-
         recordingCacheFolder = if (externalCacheDir != null) {
             externalCacheDir!!.absoluteFile.toString() + "/'"
         } else {
@@ -91,12 +95,8 @@ class MainActivity : AppCompatActivity() {
         }
         currentFilePath = recordingCacheFolder
 
-        audioRecorder = AudioRecorder(recordingCacheFolder + FILE_NAME)
-        samplePlayer = SamplePlayer(baseContext)
-
         audioFileViewModel = ViewModelProvider(this).get(AudioFileViewModel::class.java)
         audioFileViewModel.allFiles.observe(this, Observer { files ->
-            Log.d("AAA", "Observer called")
             savedFileNames.clear()
             files?.forEach { savedFileNames.add(it.name) }
             loadActionItem?.isVisible = files?.isEmpty() == false
@@ -114,6 +114,13 @@ class MainActivity : AppCompatActivity() {
         loadActionItem = menu?.findItem(R.id.actionLoad)
         loadActionItem?.isVisible = audioFileViewModel.allFiles.value?.isEmpty() == false
         return true
+    }
+
+    override fun onStart() {
+        super.onStart()
+        initialiseRecordingButtons()
+        audioRecorder = AudioRecorder(recordingCacheFolder + FILE_NAME)
+        samplePlayer = SamplePlayer(baseContext)
     }
 
     fun showSavePopupWindow(m: MenuItem) {
@@ -307,7 +314,11 @@ class MainActivity : AppCompatActivity() {
         hideSaveActionButton()
         val file = File(currentFilePath + currentFileName)
         val deleted = file.delete()
-        audioFileViewModel.delete(AudioFile(currentFileName))
+        audioFileViewModel.delete(
+            AudioFile(
+                currentFileName
+            )
+        )
         resetFilePath()
     }
 
@@ -331,7 +342,10 @@ class MainActivity : AppCompatActivity() {
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState.putBoolean("hasRecorded", RecordingState.hasRecorded)
+        outState.putBoolean(
+            "hasRecorded",
+            RecordingState.hasRecorded
+        )
     }
 
     override fun onStop() {
@@ -340,9 +354,9 @@ class MainActivity : AppCompatActivity() {
         samplePlayer?.release()
         AudioFilePlayer.release()
         showRecordButton()
+        showPlayButton()
         if (RecordingState.isRecording) {
             notifyUser()
-            showPlayButton()
             showDeleteButton()
         }
     }

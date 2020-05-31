@@ -1,13 +1,14 @@
-package com.example.looper
+package com.example.looper.activity
 
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
-import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceManager
+import com.example.looper.audio.AudioFilePlayer
+import com.example.looper.R
 
 class PreferencesActivity : AppCompatActivity(),
     SharedPreferences.OnSharedPreferenceChangeListener {
@@ -21,7 +22,10 @@ class PreferencesActivity : AppCompatActivity(),
         prefs?.registerOnSharedPreferenceChangeListener(this)
         supportFragmentManager
             .beginTransaction()
-            .replace(R.id.preferences, PreferencesFragment())
+            .replace(
+                R.id.preferences,
+                PreferencesFragment()
+            )
             .commit()
     }
 

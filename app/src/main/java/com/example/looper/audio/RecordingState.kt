@@ -1,4 +1,4 @@
-package com.example.looper
+package com.example.looper.audio
 
 object RecordingState {
     var isRecording = false

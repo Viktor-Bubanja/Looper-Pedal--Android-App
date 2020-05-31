@@ -1,11 +1,11 @@
-package com.example.looper
+package com.example.looper.audio
 
 import android.content.Context
-import android.media.AudioAttributes
 import android.media.SoundPool
 import android.util.Log
-import com.example.looper.AudioPlayer.initialiseSoundPool
-import com.example.looper.AudioPlayer.playSound
+import com.example.looper.audio.AudioPlayer.initialiseSoundPool
+import com.example.looper.audio.AudioPlayer.playSound
+import com.example.looper.R
 
 class SamplePlayer(context: Context): SoundPoolHolder {
     private var kickId: Int? = null
@@ -39,5 +39,8 @@ class SamplePlayer(context: Context): SoundPoolHolder {
     override fun release() {
         soundPool?.release()
         soundPool = null
+        kickId = null
+        snareId = null
+        hatId = null
     }
 }

@@ -1,6 +1,8 @@
-package com.example.looper
+package com.example.looper.repository
 
 import androidx.lifecycle.LiveData
+import com.example.looper.dao.AudioFileDao
+import com.example.looper.model.AudioFile
 
 class AudioFileRepository(private val audioFileDao: AudioFileDao) {
 

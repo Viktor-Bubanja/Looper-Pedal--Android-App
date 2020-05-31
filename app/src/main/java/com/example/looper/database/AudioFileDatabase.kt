@@ -1,9 +1,11 @@
-package com.example.looper
+package com.example.looper.database
 
 import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import com.example.looper.dao.AudioFileDao
+import com.example.looper.model.AudioFile
 
 @Database(entities = arrayOf(AudioFile::class), version = 1, exportSchema = false)
 public abstract class AudioFileDatabase : RoomDatabase() {
@@ -16,7 +18,8 @@ public abstract class AudioFileDatabase : RoomDatabase() {
         private var INSTANCE: AudioFileDatabase? = null
 
         fun getDatabase(context: Context): AudioFileDatabase {
-            val tempInstance = INSTANCE
+            val tempInstance =
+                INSTANCE
             if (tempInstance != null) {
                 return tempInstance
             }
