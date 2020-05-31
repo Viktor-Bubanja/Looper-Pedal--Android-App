@@ -3,4 +3,10 @@
     <dimen name="top_margin_parent">70dp</dimen>
     <dimen name="standard_size">70dp</dimen>
     <dimen name="standard_margin">70dp</dimen>
+    <dimen name="standard_radius">10dp</dimen>
+    <dimen name="card_width">300dp</dimen>
+    <dimen name="standard_padding">10dp</dimen>
+    <dimen name="small_btn_size">60dp</dimen>
+    <dimen name="small_margin">10dp</dimen>
+    <dimen name="text_size">20sp</dimen>
 </resources>

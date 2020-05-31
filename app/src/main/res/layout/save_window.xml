@@ -9,21 +9,21 @@
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:cardCornerRadius="10dp"
+        app:cardCornerRadius="@dimen/standard_radius"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
         <LinearLayout
-            android:layout_width="300dp"
+            android:layout_width="@dimen/card_width"
             android:layout_height="match_parent"
             android:orientation="vertical"
-            android:padding="10dp">
+            android:padding="@dimen/standard_padding">
 
             <ImageButton
                 android:id="@+id/closeSaveMenu"
-                android:layout_width="60dp"
-                android:layout_height="60dp"
+                android:layout_width="@dimen/small_btn_size"
+                android:layout_height="@dimen/small_btn_size"
                 android:adjustViewBounds="true"
                 android:layout_gravity="right"
                 android:background="@android:color/background_light"
@@ -37,8 +37,8 @@
                 android:layout_gravity="center"
                 android:hint="@string/filename_hint"
                 android:textColorHint="@color/lightGreen"
-                android:padding="10dp"
-                android:textSize="20sp"
+                android:padding="@dimen/standard_padding"
+                android:textSize="@dimen/text_size"
                 android:text="@string/recording"
                 android:textColor="@color/green"/>
 
@@ -46,6 +46,7 @@
                 android:id="@+id/saveButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_margin="@dimen/small_margin"
                 android:layout_gravity="center"
                 android:textColor="@color/white"
                 android:background="@color/colorPrimary"
