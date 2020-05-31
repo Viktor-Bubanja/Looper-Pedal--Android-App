@@ -9,21 +9,21 @@
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:cardCornerRadius="5dp"
+        app:cardCornerRadius="10dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
         <LinearLayout
-            android:layout_width="276dp"
+            android:layout_width="300dp"
             android:layout_height="match_parent"
             android:orientation="vertical"
             android:padding="10dp">
 
             <ImageButton
                 android:id="@+id/closeSaveMenu"
-                android:layout_width="57dp"
-                android:layout_height="48dp"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
                 android:adjustViewBounds="true"
                 android:layout_gravity="right"
                 android:background="@android:color/background_light"
@@ -50,8 +50,6 @@
                 android:textColor="@color/white"
                 android:background="@color/colorPrimary"
                 android:text="@string/save" />
-
-
         </LinearLayout>
 
     </androidx.cardview.widget.CardView>

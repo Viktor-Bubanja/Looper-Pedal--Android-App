@@ -17,9 +17,6 @@ object AudioFilePlayer: SoundPoolHolder {
     }
 
     fun playAudioFile(filename: String) {
-        Log.d("AAA", "play audio file")
-        Log.d("AAA", filename)
-
         if (soundPool == null) {
             soundPool = initialiseSoundPool()
         }
@@ -30,15 +27,11 @@ object AudioFilePlayer: SoundPoolHolder {
     }
 
     fun pauseAudioFile() {
-        Log.d("AAA", "pause audio file")
-        Log.d("AAA", audioStreamId.toString())
         audioStreamId?.let { soundPool?.pause(it) }
     }
 
     fun clearAudioFile() {
         pauseAudioFile()
-        Log.d("AAA", "clear audio file")
-        Log.d("AAA", audioStreamId.toString())
         audioStreamId?.let { soundPool?.stop(it) }
         loadedAudioId?.let { soundPool?.unload(it) }
         audioStreamId = null
