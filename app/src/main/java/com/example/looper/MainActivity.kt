@@ -1,6 +1,5 @@
 package com.example.looper
 
-
 import android.Manifest
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -15,9 +14,7 @@ import android.view.Gravity
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.Button
-import android.widget.ImageButton
-import android.widget.PopupWindow
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
@@ -52,7 +49,12 @@ class MainActivity : AppCompatActivity() {
     private var audioRecorder: AudioRecorder? = null
     private var samplePlayer: SamplePlayer? = null
 
-    private var filename: String? = null
+    private val FILE_NAME = "/RECORDING.mp3"
+    private val recordingsFolder =
+        Environment.getExternalStorageDirectory().absolutePath + "/LooperRecordings" + "/"
+    private var filePath: String? = null
+
+//    private var filename: String? = null
 
     private val CHANNEL_ID: String = "100"
 
@@ -71,15 +73,18 @@ class MainActivity : AppCompatActivity() {
         initialiseRecordingButtons()
         RecordingState.isRecording = false
 
-        Log.d("AAA", "on createa again")
-
-//        filename = "${externalCacheDir.absolutePath}/audiorecordtest.mp3"
-        filename = Environment.getExternalStorageDirectory().absolutePath + "/recording.mp3"
+        if (externalCacheDir != null) {
+            filePath = "${externalCacheDir!!.absoluteFile}" + FILE_NAME
+        } else {
+            filePath =
+                Environment.getExternalStorageDirectory().absolutePath + FILE_NAME
+        }
+        audioRecorder = AudioRecorder(filePath!!)
+        samplePlayer = SamplePlayer(baseContext)
 
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
         isLoopingFile = sharedPreferences.getBoolean("enableLooping", true)
         ActivityCompat.requestPermissions(this, permissions, REQUEST_RECORD_AUDIO_PERMISSION)
-
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -107,22 +112,55 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun showSavePopupWindow() {
-        val savePopup = createPopupWindow(R.layout.save_window, R.id.saveButton, R.id.closeSaveMenu)
-        val window = savePopup.window
-        savePopup.actionButton?.setOnClickListener { saveRecording() }
-        openPopupWindow(window)
+    private fun showSavePopupWindow() {
+        val savePopup = createPopupWindow(R.layout.save_window)
+        val popupLayout = savePopup.contentView
+        val saveButton = popupLayout.findViewById<Button>(R.id.saveButton)
+        val closeButton = popupLayout.findViewById<ImageButton>(R.id.closeSaveMenu)
+        val textView = popupLayout?.findViewById<EditText>(R.id.inputFileName)
+        saveButton.setOnClickListener {
+            savePopup.dismiss()
+            saveRecording(textView?.text.toString())
+        }
+        closeButton.setOnClickListener { savePopup.dismiss() }
+        openPopupWindow(savePopup)
     }
 
-    fun showLoadPopupWindow() {
-        val loadPopup = createPopupWindow(R.layout.load_window, R.id.loadButton, R.id.closeLoadMenu)
-        val window = loadPopup.window
-        loadPopup.actionButton?.setOnClickListener { loadRecording() }
-        openPopupWindow(window)
+
+    private fun getSavedRecordings(): MutableList<String> {
+        val savedRecordings = mutableListOf<String>()
+        File(recordingsFolder).walk().forEach {
+            savedRecordings.add(it.absolutePath)
+        }
+        return savedRecordings
+    }
+
+    private fun showLoadPopupWindow() {
+        val loadPopup = createPopupWindow(R.layout.load_window)
+        val popupLayout = loadPopup.contentView
+
+        val savedRecordingsSpinner = popupLayout.findViewById<Spinner>(R.id.savedRecordings)
+        val loadButton = popupLayout.findViewById<Button>(R.id.loadButton)
+        val closeButton = popupLayout.findViewById<ImageButton>(R.id.closeLoadMenu)
+
+        val savedRecordings = getSavedRecordings()
+
+        val spinner: Spinner = popupLayout.findViewById(R.id.savedRecordings)
+
+        val arrayAdapter: ArrayAdapter<String> =
+            ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, savedRecordings)
+        arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        spinner.adapter = arrayAdapter
+
+        loadButton.setOnClickListener {
+            loadPopup.dismiss()
+            loadRecording()
+        }
+        closeButton.setOnClickListener { loadPopup.dismiss() }
+        openPopupWindow(loadPopup)
     }
 
     private fun openPopupWindow(window: PopupWindow?) {
-        Log.d("AAA", window.toString())
         window?.showAtLocation(
             root_layout,
             Gravity.CENTER,
@@ -135,7 +173,7 @@ class MainActivity : AppCompatActivity() {
         startActivity(PreferencesActivity.newIntent(this))
     }
 
-    private fun createPopupWindow(layoutId: Int, actionButtonId: Int, closeButtonId: Int): Popup {
+    private fun createPopupWindow(layoutId: Int): PopupWindow {
         val windowView: View = layoutInflater.inflate(layoutId, null)
         val window = PopupWindow(
             windowView,
@@ -144,22 +182,18 @@ class MainActivity : AppCompatActivity() {
         )
         window.elevation = 5.0f
         window.isFocusable = true // Allows keyboard to be shown
-        val actionButton = windowView.findViewById<Button>(actionButtonId)
-        val closeButton = windowView.findViewById<ImageButton>(closeButtonId)
-        closeButton.setOnClickListener { window.dismiss() }
-        return Popup(window, actionButton, closeButton)
+        return window
     }
 
-    fun saveRecording() {
-        Log.d("AAA", "Save")
+    private fun saveRecording(userFilename: String?) {
+        val savePath = recordingsFolder + userFilename + ".mp3"
+        Log.d("AAA", savePath)
+        val outputFile = File(savePath)
+        val recording = File(filePath).copyTo(outputFile, true)
     }
 
-    fun loadRecording() {}
+    private fun loadRecording() {
 
-    override fun onStart() {
-        super.onStart()
-        audioRecorder = AudioRecorder(filename!!)
-        samplePlayer = SamplePlayer(baseContext)
     }
 
     private fun initialiseRecordingButtons() {
@@ -179,8 +213,6 @@ class MainActivity : AppCompatActivity() {
         pauseButton.setOnClickListener { onPauseRecording() }
 
         kickButton.setOnClickListener {
-            Log.d("AAA", "samplePlayer")
-            Log.d("AAA", samplePlayer.toString())
             samplePlayer?.playKick()
             clickAnimation(kickButton)
         }
@@ -236,7 +268,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun onPlayRecording() {
         showPauseButton()
-        filename?.let { AudioFilePlayer.playAudioFile(it) }
+        filePath?.let { AudioFilePlayer.playAudioFile(it) }
     }
 
     private fun onPauseRecording() {
@@ -251,9 +283,8 @@ class MainActivity : AppCompatActivity() {
         hideDeleteButton()
         hidePlayPauseButtons()
         hideSaveActionButton()
-        val file  = File(filename)
+        val file = File(filePath)
         val deleted = file.delete()
-        Log.d("AAA", deleted.toString())
     }
 
     private fun showSaveActionButton() {
@@ -287,10 +318,7 @@ class MainActivity : AppCompatActivity() {
         val intent = Intent(this, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_REORDER_TO_FRONT
         }
-
         val pendingIntent: PendingIntent = PendingIntent.getActivity(this, 0, intent, 0)
-
-
         val title = "Looper stopped recording"
         val builder = NotificationCompat.Builder(this, CHANNEL_ID)
             .setSmallIcon(R.drawable.looper_icon)
@@ -348,7 +376,6 @@ class MainActivity : AppCompatActivity() {
         playButton.visibility = View.GONE
         pauseButton.visibility = View.GONE
     }
-
 
 
 }
