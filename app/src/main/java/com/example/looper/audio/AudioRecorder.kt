@@ -9,28 +9,22 @@ class AudioRecorder(var filename: String) {
     private var recorder: MediaRecorder? = null
 
     fun start() {
-        if (!RecordingState.isRecording) {
-            recorder = MediaRecorder().apply {
-                setAudioSource(MediaRecorder.AudioSource.MIC)
-                setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
-                setAudioEncoder(MediaRecorder.AudioEncoder.AAC)
-                setOutputFile(filename)
-                try {
-                    prepare()
-                } catch (e: IOException) {
-                    Log.e("AAA", "prepare() failed")
-                }
-                start()
+        recorder = MediaRecorder().apply {
+            setAudioSource(MediaRecorder.AudioSource.MIC)
+            setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
+            setAudioEncoder(MediaRecorder.AudioEncoder.AAC)
+            setOutputFile(filename)
+            try {
+                prepare()
+            } catch (e: IOException) {
+                Log.e("AudioRecorder", "prepare() failed")
             }
-            RecordingState.isRecording = true
+            start()
         }
     }
 
     fun stop() {
-        if (RecordingState.isRecording) {
-            RecordingState.isRecording = false
-            recorder?.stop()
-        }
+        recorder?.stop()
     }
 
     fun release() {

@@ -39,7 +39,7 @@
                 android:textColorHint="@color/lightGreen"
                 android:padding="@dimen/standard_padding"
                 android:textSize="@dimen/text_size"
-                android:text="@string/recording"
+                android:text="@string/default_file_name"
                 android:textColor="@color/green"/>
 
             <Button

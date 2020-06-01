@@ -11,9 +11,14 @@
         android:icon="@drawable/load_icon"
         android:onClick="showLoadPopupWindow"
         app:showAsAction="ifRoom"/>
+    <item android:id="@+id/actionShare"
+        android:title="@string/share"
+        android:icon="@drawable/share_icon"
+        android:onClick="shareRecording"
+        app:showAsAction="never"/>
     <item android:id="@+id/actionSettings"
         android:title="@string/settings"
         android:icon="@drawable/settings_icon"
         android:onClick="goToPreferences"
-        app:showAsAction="ifRoom"/>
+        app:showAsAction="never"/>
 </menu>
