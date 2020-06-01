@@ -3,6 +3,7 @@ package com.example.looper.audio
 import android.media.MediaRecorder
 import android.util.Log
 import java.io.IOException
+import java.lang.Exception
 
 class AudioRecorder(var filename: String) {
 
@@ -16,15 +17,21 @@ class AudioRecorder(var filename: String) {
             setOutputFile(filename)
             try {
                 prepare()
-            } catch (e: IOException) {
-                Log.e("AudioRecorder", "prepare() failed")
+                start()
+            } catch (e: Exception) {
+                Log.e("AudioRecorder", e.stackTrace.toString())
             }
-            start()
         }
     }
 
     fun stop() {
-        recorder?.stop()
+        try {
+            recorder?.stop()
+        } catch (e: RuntimeException) {
+            // Throws RuntimeException when stop() is called when recording is already stopped.
+            Log.e("AudioRecorder", e.stackTrace.toString())
+        }
+
     }
 
     fun release() {

@@ -21,10 +21,6 @@ class SamplePlayer(context: Context): SoundPoolHolder {
     }
 
     fun playKick() {
-        Log.d("AAA", "kickId")
-        Log.d("AAA", kickId.toString())
-        Log.d("AAA", "soundPool")
-        Log.d("AAA", soundPool.toString())
         kickId?.let { playSound(it, soundPool) }
     }
 

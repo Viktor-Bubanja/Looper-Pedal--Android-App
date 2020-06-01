@@ -3,9 +3,11 @@ package com.example.looper.audio
 import android.media.SoundPool
 import com.example.looper.audio.AudioPlayer.initialiseSoundPool
 import com.example.looper.audio.AudioPlayer.playSound
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 
-object AudioFilePlayer: SoundPoolHolder {
+object AudioFilePlayer : SoundPoolHolder {
     var loadedAudioId: Int? = null
     private var audioStreamId: Int? = null
     var isLoopingFile: Boolean = true
@@ -16,15 +18,15 @@ object AudioFilePlayer: SoundPoolHolder {
     }
 
     fun playAudioFile(filename: String) {
-        if (soundPool == null) {
-            soundPool = initialiseSoundPool()
+        GlobalScope.launch {
+            if (soundPool == null) {
+                soundPool = initialiseSoundPool()
+            }
+            soundPool?.setOnLoadCompleteListener { soundPool, sampleId, _ ->
+                audioStreamId = playSound(sampleId, soundPool, isLoopingFile)
+            }
+            loadedAudioId = soundPool?.load(filename, 1)
         }
-        soundPool?.setOnLoadCompleteListener { soundPool, sampleId, status ->
-            audioStreamId = playSound(sampleId, soundPool,
-                isLoopingFile
-            )
-        }
-        loadedAudioId = soundPool?.load(filename, 1)
     }
 
     fun pauseAudioFile() {

@@ -7,6 +7,10 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.hardware.Sensor
+import android.hardware.SensorEvent
+import android.hardware.SensorEventListener
+import android.hardware.SensorManager
 import android.os.Bundle
 import android.os.Environment
 import android.util.Log
@@ -35,12 +39,13 @@ import com.example.looper.model.AudioFile
 import com.example.looper.viewmodel.AudioFileViewModel
 import kotlinx.android.synthetic.main.activity_main.*
 import java.io.File
+import java.lang.Math.abs
 
 
 private const val REQUEST_RECORD_AUDIO_PERMISSION = 200
 private const val REQUEST_WRITE_FILE_PERMISSION = 400
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), SensorEventListener {
 
     private lateinit var recordButton: ImageButton
     private lateinit var stopRecordButton: ImageButton
@@ -60,6 +65,9 @@ class MainActivity : AppCompatActivity() {
 
     private var currentFileName: String = DEFAULT_FILENAME
 
+    private var autoPlayAudio: Boolean = false
+    private var motionDetection: Boolean = false
+
     private val recordingsFolder =
         Environment.getExternalStorageDirectory().absolutePath + "/LooperRecordings" + "/"
 
@@ -68,10 +76,16 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var audioFileViewModel: AudioFileViewModel
 
+    private val audioState = AudioState()
+
+    private lateinit var sensorManager: SensorManager
+    private var accelerometer: Sensor? = null
+    private val MIN_ACCELERATION = 2F
+    private val MIN_TIME_BETWEEN_EVENTS = 1e9 // 1 second
+    private var lastRecordedSensorEvent = 0L
+
     private var permissionToRecordAccepted = false
     private var permissionToWriteFileAccepted = false
-
-    private val audioState = AudioState()
 
     private var permissions: Array<String> = arrayOf(
         Manifest.permission.RECORD_AUDIO,
@@ -101,15 +115,39 @@ class MainActivity : AppCompatActivity() {
         audioState.isRecording = false
         audioState.recordingLoaded = false
 
-        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
-        isLoopingFile = sharedPreferences.getBoolean("enableLooping", true)
+        sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
+        accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
+
         ActivityCompat.requestPermissions(this, permissions, REQUEST_RECORD_AUDIO_PERMISSION)
     }
 
     override fun onStart() {
         super.onStart()
+
         audioRecorder = AudioRecorder(recordingCacheFolder + DEFAULT_FILENAME)
         samplePlayer = SamplePlayer(baseContext)
+    }
+
+    override fun onResume() {
+        super.onResume();
+        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
+        isLoopingFile = sharedPreferences.getBoolean("enableLooping", true)
+        autoPlayAudio = sharedPreferences.getBoolean("autoPlayAudio", false)
+        motionDetection = sharedPreferences.getBoolean("motionDetection", false)
+        if (motionDetection) {
+            registerAccelerometerListener()
+        }
+    }
+
+    private fun registerAccelerometerListener() {
+        sensorManager.registerListener(this, this.accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
+    }
+
+    override fun onPause() {
+        super.onPause();
+        if (motionDetection) {
+            sensorManager.unregisterListener(this);
+        }
     }
 
     override fun onStop() {
@@ -149,33 +187,17 @@ class MainActivity : AppCompatActivity() {
         deleteButton = findViewById(R.id.deleteButton)
     }
 
-    private fun saveRecording(userFilename: String?) {
-        val filename = "$userFilename.mp3"
-        val savePath = recordingsFolder + filename
-        val outputFile = File(savePath)
-        File(getRecordedCacheFilePath()).copyTo(outputFile, true)
-        audioFileViewModel.insert(AudioFile(filename))
-        setFilePath(filename)
-    }
-
-    private fun loadRecording(filename: String?) {
-        audioState.recordingLoaded = true
-        this.currentFilePath = recordingsFolder
-        this.currentFileName = filename!!
-        setFilePath(filename)
-    }
-
-    fun playKick(v: View) {
+    fun playKick(v: View?) {
         samplePlayer?.playKick()
         clickAnimation(kickButton)
     }
 
-    fun playSnare(v: View) {
+    fun playSnare(v: View?) {
         samplePlayer?.playSnare()
         clickAnimation(snareButton)
     }
 
-    fun playHat(v: View) {
+    fun playHat(v: View?) {
         samplePlayer?.playHat()
         clickAnimation(hatButton)
     }
@@ -184,20 +206,26 @@ class MainActivity : AppCompatActivity() {
         return this.recordingCacheFolder + DEFAULT_FILENAME
     }
 
-    fun onStartRecording(v: View) {
+    fun onStartRecording(v: View?) {
+        if (audioState.isPlaying) {
+            onPauseAudio(null)
+        }
         audioState.isRecording = true
         audioState.recordingLoaded = false
         audioRecorder?.start()
         resetFilePath()
     }
 
-    fun onStopRecording(v: View) {
+    fun onStopRecording(v: View?) {
         audioState.isRecording = false
         audioState.recordingLoaded = true
         audioRecorder?.stop()
+        if (autoPlayAudio) {
+            onPlayAudio(null)
+        }
     }
 
-    fun onPlayAudio(v: View) {
+    fun onPlayAudio(v: View?) {
         audioState.isPlaying = true
         AudioFilePlayer.playAudioFile(currentFilePath + currentFileName)
     }
@@ -207,7 +235,7 @@ class MainActivity : AppCompatActivity() {
         pauseAudioFile()
     }
 
-    fun deleteAudio(v: View) {
+    fun deleteAudio(v: View?) {
         audioState.recordingLoaded = false
         AudioFilePlayer.clearAudioFile()
         AudioFilePlayer.release()
@@ -215,6 +243,21 @@ class MainActivity : AppCompatActivity() {
         file.delete()
         audioFileViewModel.delete(AudioFile(currentFileName))
         resetFilePath()
+    }
+
+    private fun saveRecording(userFilename: String) {
+        val savePath = recordingsFolder + userFilename
+        val outputFile = File(savePath)
+        File(getRecordedCacheFilePath()).copyTo(outputFile, true)
+        audioFileViewModel.insert(AudioFile(userFilename))
+        setFilePath(userFilename)
+    }
+
+    private fun loadRecording(filename: String?) {
+        audioState.recordingLoaded = true
+        this.currentFilePath = recordingsFolder
+        this.currentFileName = filename!!
+        setFilePath(filename)
     }
 
     private fun resetFilePath() {
@@ -226,7 +269,6 @@ class MainActivity : AppCompatActivity() {
         currentFilePath = recordingsFolder
         currentFileName = filename
     }
-
 
     private fun setSaveActionButtonVisibility(visible: Boolean) {
         saveActionItem?.isVisible = visible
@@ -242,6 +284,26 @@ class MainActivity : AppCompatActivity() {
 
     private fun setShareActionButtonVisibility(visible: Boolean) {
         shareActionItem?.isVisible = visible
+    }
+
+    override fun onAccuracyChanged(p0: Sensor?, p1: Int) {}
+
+    override fun onSensorChanged(sensorEvent: SensorEvent?) {
+        val timestamp = sensorEvent?.timestamp ?: 0L
+        val timeSinceLastEvent = timestamp - lastRecordedSensorEvent
+
+        val change = sensorEvent?.values?.get(0).let { abs(it!!) }
+        if (sensorEvent?.sensor?.type == Sensor.TYPE_ACCELEROMETER
+            && change > MIN_ACCELERATION
+            && timeSinceLastEvent > MIN_TIME_BETWEEN_EVENTS
+        ) {
+            lastRecordedSensorEvent = timestamp
+            if (audioState.isRecording) {
+                onStopRecording(null)
+            } else {
+                onStartRecording(null)
+            }
+        }
     }
 
     fun goToPreferences(m: MenuItem) {
@@ -266,10 +328,17 @@ class MainActivity : AppCompatActivity() {
         val popupLayout = savePopup.contentView
         val saveButton = popupLayout.findViewById<Button>(R.id.saveButton)
         val closeButton = popupLayout.findViewById<ImageButton>(R.id.closeSaveMenu)
-        val textView = popupLayout?.findViewById<EditText>(R.id.inputFileName)
+        val textView = popupLayout?.findViewById<EditText>(R.id.inputFilename)
         saveButton.setOnClickListener {
+            val inputText: String = textView?.text.toString()
+            if (inputText.isEmpty()) {
+                val text = getString(R.string.empty_filename_msg)
+                val duration = Toast.LENGTH_SHORT
+                Toast.makeText(applicationContext, text, duration).show()
+            } else {
+                saveRecording(inputText)
+            }
             savePopup.dismiss()
-            saveRecording(textView?.text.toString())
         }
         closeButton.setOnClickListener { savePopup.dismiss() }
         openPopupWindow(savePopup)
@@ -347,7 +416,8 @@ class MainActivity : AppCompatActivity() {
         val name = getString(R.string.channel_name)
         val descriptionText = getString(R.string.channel_description)
         val importance = NotificationManager.IMPORTANCE_LOW
-        val channel = NotificationChannel(CHANNEL_ID, name, importance
+        val channel = NotificationChannel(
+            CHANNEL_ID, name, importance
         ).apply {
             description = descriptionText
         }
@@ -402,9 +472,11 @@ class MainActivity : AppCompatActivity() {
             set(value) {
                 field = value
                 when (value) {
-                    true -> showPauseButton()
+                    true -> {
+                        if (recordingLoaded) showPauseButton()
+                    }
                     false -> {
-                        showPlayButton()
+                        if (recordingLoaded) showPlayButton()
                     }
                 }
             }
@@ -413,7 +485,6 @@ class MainActivity : AppCompatActivity() {
             set(value) {
                 field = value
                 setShareActionButtonVisibility(!value)
-                setSettingsActionButtonVisibility(!value)
                 when (value) {
                     true -> {
                         showStopRecordButton()
@@ -428,9 +499,9 @@ class MainActivity : AppCompatActivity() {
             set(value) {
                 field = value
                 setSaveActionButtonVisibility(value)
+                setShareActionButtonVisibility(value)
                 when (value) {
                     true -> {
-                        Log.d("AAA", "recording loaded true")
                         showPlayButton()
                         showDeleteButton()
                     }

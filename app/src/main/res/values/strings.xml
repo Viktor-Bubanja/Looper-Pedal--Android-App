@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Looper</string>
     <string name="looping">Looping</string>
-    <string name="enable_looping">Enable looping</string>
+    <string name="enable_looping_title">Loop audio</string>
     <string name="looping_pref_summary">When enabled, recorded audio will be looped.</string>
     <string name="channel_name">notifications</string>
     <string name="channel_description">notification channel</string>
@@ -14,4 +14,9 @@
     <string name="share">Share</string>
     <string name="send_to">Share recording to</string>
     <string name="notification_title">Looper stopped recording</string>
+    <string name="auto_play_audio_title">Automatically play audio</string>
+    <string name="auto_play_summary">When enabled, audio will be automatically played after recording.</string>
+    <string name="motion_detection_title">Motion detection</string>
+    <string name="motion_detection_summary">When enabled, allows you to start and stop recording by slightly moving your device.</string>
+    <string name="empty_filename_msg">Filename can\'t be empty!</string>
 </resources>

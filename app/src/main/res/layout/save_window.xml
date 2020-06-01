@@ -31,7 +31,7 @@
                 app:srcCompat="@drawable/close_icon" />
 
             <EditText
-                android:id="@+id/inputFileName"
+                android:id="@+id/inputFilename"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
@@ -39,7 +39,6 @@
                 android:textColorHint="@color/lightGreen"
                 android:padding="@dimen/standard_padding"
                 android:textSize="@dimen/text_size"
-                android:text="@string/default_file_name"
                 android:textColor="@color/green"/>
 
             <Button
